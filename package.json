@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  
+      "start": "node index.js",
+      "dev" : "nodema index.js"
   },
   "keywords": [],
   "author": "",
