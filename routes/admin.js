@@ -43,7 +43,7 @@ adminRouter.post("/signin", async function(req, res) {
 
 })
 
-adminRouter.post("/course", adminMiddleware, async function(req, res) {
+adminRouter.post("/course", adminMiddleware(JWT_ADMIN_PASSWORD), async function(req, res) {
     const adminId = req.userId;
 
     const {title, description, imageUrl ,price} = req.body;
