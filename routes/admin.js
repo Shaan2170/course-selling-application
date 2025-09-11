@@ -1,8 +1,10 @@
 const { Router } = require("express");
 const adminRouter = Router();
-const { adminModel } = require ("../db");
-const jwt = require ("jsonwebtoken");   
+const { adminModel, courseModel } = require("../db"); // FIX: Added courseModel import
+const jwt = require ("jsonwebtoken");  
+ 
 const { JWT_ADMIN_PASSWORD } = require("../config");
+const { adminMiddleware } = require("../middleware/admin");
 
 adminRouter.post("/signup", async function(req, res) {
       const {email, password , firstName, lastName } = req.body;
@@ -20,30 +22,32 @@ adminRouter.post("/signup", async function(req, res) {
 })
 
 adminRouter.post("/signin", async function(req, res) {
-        const { email, password } = req.body;
-    
-        const admin = await adminModel.findOne({
-            email: email,
-            password: password
+    const { email, password } = req.body;
+
+    const admin = await adminModel.findOne({
+        email: email,
+        password: password
+    });
+
+    if (admin) {
+        // FIX: Use JWT_ADMIN_PASSWORD and assign token
+        const token = jwt.sign(
+            { id: admin._id },
+            JWT_ADMIN_PASSWORD
+        );
+
+        res.json({
+            token: token
         });
-    
-        if (admin) {
-            jwt.sign ({
-                id: admin._id
-            }, JWT_USER_PASSWORD);
-    
-            res.json({
-                token: token
-            })
-        } else {
-            res.json({
+    } else {
+        res.json({
             message: "Incorrect credentials"
-        })
+        });
     }
 
 })
 
-adminRouter.post("/course", adminMiddleware(JWT_ADMIN_PASSWORD), async function(req, res) {
+adminRouter.post("/course", adminMiddleware, async function(req, res) {
     const adminId = req.userId;
 
     const {title, description, imageUrl ,price} = req.body;
@@ -53,11 +57,11 @@ adminRouter.post("/course", adminMiddleware(JWT_ADMIN_PASSWORD), async function(
         description : description,
         imageUrl: imageUrl,
         price: price,
-        adminId: adminId
+        creatorId: adminId
     })
 
     res.json({
-        message: "Coyrse created",
+        message: "Course created",
         courseId: course ._id
     })
 })

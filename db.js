@@ -17,10 +17,11 @@ const adminSchema = new Schema({
 });
 
 const courseSchema = new Schema({
-    email: {type: String, unique: true},
-    password: String,
-    firstName: String,
-    lastName: String,
+    title: String,
+    description: String,
+    price: Number,
+    imageUrl: String,
+    creatorId: ObjectId
 });
 
 const purchaseSchema = new Schema({
